@@ -78,8 +78,12 @@
 <h3>2.2 한국어 뉴스 텍스트 마이닝과 매체 비교</h3>
 <p>한국어 뉴스 텍스트 마이닝은 토픽 모델링과 네트워크 분석을 중심으로 발전해 왔다. 진설아 외(2013)는 동시출현단어분석으로 트위터 토픽 변화를 추적하였다. 정안용 외(2022)는 6,131건의 헤드라인으로 스마트도시 보도의 변화를 추적하였다. 최정균 외(2017)는 세월호 보도를 텍스트 마이닝으로 분석해 언론사 성향별 차이를 드러내었다. 그러나 이들 연구는 대체로 키워드·토픽 수준이거나 소수 일간지에 한정되어, 매체 단위의 대규모 의미 비교에는 이르지 못하였다.</p>
 
+<p>최근 한국어 뉴스 연구는 키워드를 넘어 의미 임베딩으로 전환되고 있다. 박지원 외(2026)는 S-BERT와 LLM 임베딩의 토픽 모델링 성능을 비교하였다. 이인규·강현철(2025)은 한국어 뉴스의 AI 생성 여부 판별에 임베딩을 적용하였다. 김도경(2026)은 문장 임베딩과 LLM 추론으로 보도 프레임을 측정하였다. 이러한 흐름은 한국어 뉴스 분석이 의미 벡터 기반으로 이동하고 있음을 보여준다.</p>
+
 <h3>2.3 포털뉴스 어뷰징·중복 보도 연구</h3>
-<p>매체 간 보도 동질화는 영문 전통에서 매체 간 의제 설정으로 다루어져 왔다(McCombs &amp; Shaw, 1972; Vargo et al., 2018). 한국에서는 이 동질화가 포털뉴스 어뷰징 연구로 발전하였다. 조영신 외(2015)는 매체 지위가 어뷰징 빈도에 미치는 영향을 실증하였다. 함민정·이상우(2018)는 실시간 검색어 기반 어뷰징을 사례로 분석하였다. 그러나 기존 연구는 단일 사례·정성적 관찰에 의존하여, 의미 임베딩 기반의 매체 단위 대규모 측정과는 거리가 있다.</p>
+<p>매체 간 보도 동질화는 영문 전통에서 매체 간 의제 설정으로 다루어져 왔다(McCombs &amp; Shaw, 1972; Vargo et al., 2018). 한국에서는 이 동질화가 포털뉴스 어뷰징 연구로 발전하였다. 조영신 외(2015)는 매체 지위가 어뷰징 빈도에 미치는 영향을 실증하였다. 함민정·이상우(2018)는 실시간 검색어 기반 어뷰징을 사례로 분석하였다. 송석현(2019)은 미디어 플랫폼 어뷰징의 법적 규제 문제를 검토하였다.</p>
+
+<p>매체 간 동질화를 의미 유사도로 직접 측정한 시도도 최근 등장하였다. 이종혁(2021)은 Doc2Vec 문서 유사도로 매체 간 뉴스 동질화 현상을 탐색하였다. 안정윤·이종혁(2015)은 매체 간 이슈 속성 네트워크의 유사성을 분석하였다. 박대민 외(2018)는 유사도·공동출현에 기초한 뉴스문장 연결망 알고리즘을 제안하였다. 영문에서도 Wang과 Shi(2022, 2023)가 매체 간 의제 설정을 전산적으로 분석하였다. 그러나 이들은 Doc2Vec·어휘·네트워크 수준에 머물러, 다국어 대형 임베딩을 매체 centroid 단위로 적용하고 집계 단위를 체계적으로 비교한 본 연구와 구별된다.</p>
 
 <!-- 3 -->
 <h2>3. 연구문제와 가설</h2>
@@ -118,7 +122,9 @@
 <p>매체 단위 분석에서는 정규화를 두 단계로 적용한다. 먼저 각 기사의 임베딩을 단위벡터로 정규화한다. 다음으로 한 매체에 속한 기사 벡터들을 평균하여 그 매체의 centroid를 만든다. 이 평균 벡터를 다시 한 번 L2 정규화하여 길이를 1로 맞춘다. 그래야 매체 간 centroid 비교도 동일하게 방향만으로 이루어진다.</p>
 
 <h3>4.3 네 가지 임베딩 방식</h3>
-<p>결과의 강건성을 위해 네 가지 임베딩 방식을 같은 기사에 적용한다. 임베딩 모델은 bge-m3(1,024차원)와 text-embedding-3-large(3,072차원) 두 가지다. 입력 텍스트는 제목+본문과 명사 TF-IDF 묶음 두 가지다. 후자는 형태소 분석으로 명사를 추출하고 TF-IDF가 0.05 이상인 명사만 남겨 임베딩한다. 두 모델과 두 입력을 곱하면 네 가지 방식이 되며, 모두 동일한 결론을 주는지 본다.</p>
+<p>한국어 뉴스 임베딩에는 여러 모델 선택지가 있으며 용도에 따라 적합한 모델이 다르다. 짧은 헤드라인·문장에는 한국어 SBERT 계열이 무난하다. 대표적으로 ko-sroberta-multitask, KoSimCSE, KR-SBERT가 널리 쓰인다. 긴 본문이나 검색·RAG에는 다국어·장문 모델이 강점을 보인다. bge-m3는 다국어와 8,192토큰 장문을 지원해 긴 뉴스 본문을 통째로 임베딩할 때 사실상 표준급으로 채택되며, multilingual-e5-large나 고려대 KURE-v1도 한국어 검색에서 상위 성능을 보고한다.</p>
+
+<p>본 연구는 이 가운데 bge-m3와 text-embedding-3-large 두 모델을 채택하였다. bge-m3는 긴 본문을 손실 없이 담을 수 있고 자체 서버(GPU)에 올려 비용 없이 대량 처리가 가능하다. text-embedding-3-large는 인프라 부담 없이 안정적 품질을 제공하는 API 기준선으로 함께 두었다. 두 모델(1,024·3,072차원)에 각각 제목+본문과 명사 TF-IDF 묶음 두 입력을 적용해 네 가지 방식을 만든다. 후자는 형태소 분석으로 명사를 추출하고 TF-IDF가 0.05 이상인 명사만 남겨 임베딩한다. 네 방식이 모두 동일한 결론을 주는지로 결과의 강건성을 확인한다.</p>
 
 <h3>4.4 집계 단위와 centroid</h3>
 <p>본 연구의 핵심 설계는 유사도를 세 가지 집계 단위에서 측정하는 것이다. 첫째는 기사 단위로, 개별 기사 벡터 쌍의 코사인을 본다. 둘째는 기자-매체 단위로, 같은 매체의 같은 기자가 쓴 기사를 centroid로 묶는다. 셋째는 매체 단위로, 한 매체의 모든 기사를 centroid로 묶어 매체 간 코사인을 본다. 각 단위에서 그 단위에 속한 기사를 평균·정규화한 centroid 사이의 유사도를 측정한다.</p>
@@ -217,7 +223,14 @@
 <!-- 7 -->
 <h2>7. 참고문헌</h2>
 <div class="refs">
+<p>김도경 (2026). 문장 임베딩과 LLM 기반 추론을 활용한 '중국 책임 귀인 프레임' 사용의 측정 — 2014–2022년 한국. 중국사회과학논총.</p>
+<p>박대민·서봉원·김성현 (2018). 유사도, 기사 공동 출현, 정보원에 기초한 뉴스문장연결망 분석 알고리즘 제안. 커뮤니케이션 이론.</p>
+<p>박지원·양치복·이충권 (2026). 문서 임베딩 생성 방법에 따른 토픽 모델링 성능 비교: S-BERT와 LLM 임베딩 모델 중심으로. 스마트미디어저널.</p>
+<p>송석현 (2019). 미디어 플랫폼 어뷰징의 법적 문제: 어뷰징 행위에 대한 규제를 중심으로. 법학연구, 29(4).</p>
+<p>안정윤·이종혁 (2015). '네트워크 의제설정'의 출현: 뉴스 매체와 온라인 게시판 간 이슈 속성 네트워크의 유사성 분석. 한국언론학보.</p>
 <p>유재광·오경수 (2012). 신문의 뉴스프레임과 정치인 발언 보도태도 연구: 미디어법 이슈를 중심으로. 정치커뮤니케이션 연구, 26, 73–113.</p>
+<p>이인규·강현철 (2025). 한국어 뉴스 데이터의 AI 생성 여부를 판별하기 위한 임베딩 방법과 머신러닝 모형의 적용에 관한 사례연구. Journal of The Korean Data Analysis Society.</p>
+<p>이종혁 (2021). 매체 간 뉴스 동질화 현상에 대한 탐색적 연구: Doc2Vec을 통한 문서 유사도 측정의 활용. 언론정보연구.</p>
 <p>정안용·박진영·남윤재 (2022). 텍스트마이닝과 네트워크분석을 활용한 스마트도시 언론보도 분석. Journal of The Korean Data Analysis Society, 24(4), 1563–1582.</p>
 <p>조영신·유수정·한영주 (2015). 포털 기사 공급 형태 및 매체 지위와 어뷰징과의 관계에 대한 탐색적 연구: '네이버'를 중심으로. 한국언론학보, 59(6), 314–338.</p>
 <p>진설아·허고은·정유경·송민 (2013). 트위터 데이터를 이용한 네트워크 기반 토픽 변화 추적 연구. 정보관리학회지, 30(1), 285–302.</p>
@@ -227,9 +240,13 @@
 <p>Chen, X., Hale, S. A., Jurgens, D., Samory, M., Zuckerman, E., &amp; Grabowicz, P. A. (2024). Global news synchrony and diversity during the start of the COVID-19 pandemic. In <i>Proceedings of the ACM Web Conference 2024 (WWW '24)</i> (pp. 2639–2650). ACM.</p>
 <p>Devlin, J., Chang, M.-W., Lee, K., &amp; Toutanova, K. (2019). BERT: Pre-training of deep bidirectional transformers for language understanding. In <i>NAACL-HLT</i> (pp. 4171–4186).</p>
 <p>Gao, T., Yao, X., &amp; Chen, D. (2021). SimCSE: Simple contrastive learning of sentence embeddings. In <i>EMNLP</i> (pp. 6894–6910).</p>
+<p>Ghinassi, I., Wang, L., &amp; Newell, C. (2023). Comparing neural sentence encoders for topic segmentation across domains. <i>PeerJ Computer Science</i>.</p>
+<p>Hosseinmardi, H., Wolken, S., &amp; Rothschild, D. M. (2025). Unpacking media bias in the growing divide between cable and network news. <i>Scientific Reports</i>.</p>
 <p>McCombs, M. E., &amp; Shaw, D. L. (1972). The agenda-setting function of mass media. <i>Public Opinion Quarterly, 36</i>(2), 176–187.</p>
 <p>Reimers, N., &amp; Gurevych, I. (2019). Sentence-BERT: Sentence embeddings using Siamese BERT-networks. In <i>EMNLP-IJCNLP</i> (pp. 3982–3992).</p>
+<p>Shi, J., &amp; Wang, H. (2023). Examining the intermedia agenda-setting effects amid the Changsheng vaccine crisis. <i>International Journal of Environmental Research and Public Health</i>.</p>
 <p>Vargo, C. J., Guo, L., &amp; Amazeen, M. A. (2018). The agenda-setting power of fake news. <i>New Media &amp; Society, 20</i>(5), 2028–2049.</p>
+<p>Wang, H., &amp; Shi, J. (2022). Intermedia agenda setting amid the pandemic: A computational analysis. <i>Computational Intelligence and Neuroscience</i>.</p>
 </div>
 
 <footer>

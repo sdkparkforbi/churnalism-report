@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PE·비PE 부정이슈 이벤트 타임라인</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --ink: #14181f;
+    --paper: #f6f4ef;
+    --grid: #d9d4c8;
+    --muted: #6b6f78;
+    --pe: #1f4e79;
+    --pe-soft: #e4ecf4;
+    --pe-line: #2f6db0;
+    --npe: #b8531a;
+    --npe-soft: #f6e7da;
+    --npe-line: #d4732e;
+    --t0: #14181f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #cdc8bc;
+    font-family: 'IBM Plex Sans KR', sans-serif;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .sheet {
+    width: 1180px;
+    background: var(--paper);
+    padding: 56px 60px 64px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.22);
+  }
+
+  /* Header */
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .26em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 33px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  h1 .accent { color: var(--npe); }
+  .sub {
+    font-size: 14.5px;
+    color: var(--muted);
+    font-weight: 400;
+    max-width: 760px;
+    line-height: 1.55;
+  }
+  .legend {
+    display: flex;
+    gap: 28px;
+    margin-top: 22px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .legend .item { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 26px; height: 12px; border-radius: 2px; }
+  .swatch.pe { background: var(--pe); }
+  .swatch.npe { background: var(--npe); }
+  .legend .t0mark {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--t0); border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1.5px var(--t0);
+  }
+  .legend .small { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+
+  /* Timeline grid */
+  .chart { margin-top: 40px; position: relative; }
+
+  .axis {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1.5px solid var(--ink);
+    position: relative;
+  }
+  .axis .yr {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 0 0 10px;
+    color: var(--ink);
+    border-left: 1px solid var(--grid);
+  }
+  .axis .yr:first-child { border-left: none; }
+
+  .lane-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 26px 0 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .lane-label.pe { color: var(--pe); }
+  .lane-label.npe { color: var(--npe); }
+  .lane-label .rule { flex: 1; height: 1px; }
+  .lane-label.pe .rule { background: var(--pe-line); opacity: .35; }
+  .lane-label.npe .rule { background: var(--npe-line); opacity: .35; }
+
+  .lanes { position: relative; }
+
+  /* vertical year gridlines overlaying lanes */
+  .gridlines {
+    position: absolute; inset: 0; z-index: 0;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    pointer-events: none;
+  }
+  .gridlines span { border-left: 1px solid var(--grid); }
+  .gridlines span:first-child { border-left: none; }
+
+  .row {
+    position: relative;
+    height: 46px;
+    z-index: 1;
+  }
+  .track {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    height: 7px;
+    border-radius: 4px;
+  }
+  .row.pe .track { background: var(--pe-soft); }
+  .row.npe .track { background: var(--npe-soft); }
+  .row.pe .track .fill { background: var(--pe-line); }
+  .row.npe .track .fill { background: var(--npe-line); }
+  .track .fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    border-radius: 4px; opacity: .5;
+  }
+
+  .name {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    font-size: 13.5px; font-weight: 600;
+    white-space: nowrap;
+  }
+  .name .org {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px; font-weight: 500;
+    color: var(--muted); margin-left: 7px;
+  }
+
+  /* shock markers */
+  .shock {
+    position: absolute; top: 50%;
+    width: 9px; height: 9px; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--muted);
+    z-index: 2;
+  }
+  .row.pe .shock { background: var(--pe-line); }
+  .row.npe .shock { background: var(--npe-line); }
+  .shock.t0 {
+    width: 15px; height: 15px;
+    background: var(--t0);
+    border: 2.5px solid var(--paper);
+    box-shadow: 0 0 0 2px var(--t0);
+    z-index: 3;
+  }
+  .shock .lbl {
+    position: absolute; left: 50%; bottom: 16px;
+    transform: translateX(-50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px; font-weight: 600;
+    color: var(--ink); white-space: nowrap;
+    background: rgba(246,244,239,.85);
+    padding: 0 3px;
+  }
+  .shock .lbl.below {
+    bottom: auto; top: 16px;
+  }
+
+  /* footnote */
+  .note {
+    margin-top: 44px;
+    border-top: 1px solid var(--grid);
+    padding-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 40px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .note b { color: var(--ink); font-weight: 600; }
+  .note .warn b { color: var(--npe); }
+  .foot {
+    margin-top: 26px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .04em;
+    color: var(--muted);
+    display: flex; justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="eyebrow">UNIT-ROOT TEST · EVENT TIMELINE</div>
+    <h1>사모펀드·비(非)PE 부정이슈 <span class="accent">10건</span> 이벤트 타임라인</h1>
+    <p class="sub">뉴스 임베딩 코사인 유사도의 충격 비소멸(ρ≈1) 검정을 위한 사건 정렬. 굵은 점은 이슈 본격화 시점(t=0), 작은 점은 한 사례 내 추가 충격점.</p>
+
+    <div class="legend">
+      <div class="item"><span class="swatch pe"></span> PE · 사모펀드 LBO·경영권 (5)</div>
+      <div class="item"><span class="swatch npe"></span> 비PE · 지급불능·정산피해 (5)</div>
+      <div class="item"><span class="t0mark"></span> t=0 본격화</div>
+      <div class="item"><span class="small"></span> 추가 충격점</div>
+    </div>
+
+    <div class="chart">
+      <div class="axis">
+        <div class="yr">2021</div>
+        <div class="yr">2022</div>
+        <div class="yr">2023</div>
+        <div class="yr">2024</div>
+        <div class="yr">2025</div>
+      </div>
+
+      <div class="lanes">
+        <div class="gridlines"><span></span><span></span><span></span><span></span><span></span></div>
+
+        <!-- PE -->
+        <div class="lane-label pe">PE GROUP<span class="rule"></span></div>
+
+        <!-- 홈플러스: 2025.03 t0, 2025.12 -->
+        <div class="row pe">
+          <div class="track" style="left:80%; right:0;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:55%;">홈플러스 <span class="org">MBK</span></div>
+          <div class="shock t0" style="left:84.5%;"><span class="lbl">2025.03 회생신청</span></div>
+          <div class="shock" style="left:99%;"><span class="lbl below">25.12</span></div>
+        </div>
+
+        <!-- 오스템: 2023.06, 2023.08 t0 -->
+        <div class="row pe">
+          <div class="track" style="left:48%; width:9%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:58.5%;">오스템임플란트 <span class="org">MBK·UCK</span></div>
+          <div class="shock" style="left:47.5%;"><span class="lbl below">23.06</span></div>
+          <div class="shock t0" style="left:54.5%;"><span class="lbl">2023.08 상폐</span></div>
+        </div>
+
+        <!-- 락앤락: 2021 매각, 2023.11 t0, 2024.01 -->
+        <div class="row pe">
+          <div class="track" style="left:8%; width:60%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:69%;">락앤락 <span class="org">어피니티</span></div>
+          <div class="shock" style="left:8%;"><span class="lbl below">21 공장매각</span></div>
+          <div class="shock t0" style="left:62.5%;"><span class="lbl">2023.11 공장중단</span></div>
+          <div class="shock" style="left:67%;"><span class="lbl below">24.01 해고</span></div>
+        </div>
+
+        <!-- 남양유업: 2021.05 SPA, 2024.01 t0 -->
+        <div class="row pe">
+          <div class="track" style="left:7%; width:60%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:68.5%;">남양유업 <span class="org">한앤</span></div>
+          <div class="shock" style="left:7%;"><span class="lbl below">21.05 SPA</span></div>
+          <div class="shock t0" style="left:66.5%;"><span class="lbl">2024.01 대법확정</span></div>
+        </div>
+
+        <!-- 고려아연: 2024.09 t0 -->
+        <div class="row pe">
+          <div class="track" style="left:73%; width:3%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:51%;">고려아연 <span class="org">MBK·영풍</span></div>
+          <div class="shock t0" style="left:74.5%;"><span class="lbl">2024.09 공개매수</span></div>
+        </div>
+
+        <!-- 비PE -->
+        <div class="lane-label npe">NON-PE GROUP<span class="rule"></span></div>
+
+        <!-- 큐텐 티메프: 2023.10, 2024.07 t0 -->
+        <div class="row npe">
+          <div class="track" style="left:68%; width:6%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:42%;">큐텐(티메프) <span class="org">e-commerce</span></div>
+          <div class="shock" style="left:68%;"><span class="lbl below">23.10 정산변경</span></div>
+          <div class="shock t0" style="left:72.5%;"><span class="lbl">2024.07 지연선언</span></div>
+        </div>
+
+        <!-- 해피머니: 2024.08 t0 -->
+        <div class="row npe">
+          <div class="track" style="left:73.5%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:50%;">해피머니 <span class="org">상품권</span></div>
+          <div class="shock t0" style="left:73.5%;"><span class="lbl">2024.08 환불중단</span></div>
+        </div>
+
+        <!-- 머지포인트: 2021.08 t0 -->
+        <div class="row npe">
+          <div class="track" style="left:10%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:13.5%;">머지포인트 <span class="org">핀테크 선불</span></div>
+          <div class="shock t0" style="left:10%;"><span class="lbl">2021.08 환불대란</span></div>
+        </div>
+
+        <!-- 위메프: 2024.07 t0 -->
+        <div class="row npe">
+          <div class="track" style="left:72.5%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:50%;">위메프 <span class="org">e-commerce</span></div>
+          <div class="shock t0" style="left:72.5%;"><span class="lbl">2024.07 미정산</span></div>
+        </div>
+
+        <!-- 티몬: 2024.07 t0 -->
+        <div class="row npe">
+          <div class="track" style="left:72.5%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
+          <div class="name" style="left:50%;">티몬 <span class="org">e-commerce</span></div>
+          <div class="shock t0" style="left:72.5%;"><span class="lbl">2024.07 매각절차</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div><b>다중 충격점 구조</b> — 락앤락·큐텐·남양유업은 한 사례 안에 충격이 반복 주입된다. 코사인 유사도가 떨어질 만하면 다시 충격이 들어와 0.9에 재고정되는 패턴이 예상되므로, 충격 더미변수로 통제 필요.</div>
+      <div class="warn"><b>의도된 중복</b> — 큐텐·위메프·티몬은 동일 티메프 사태로 임베딩 유사도 0.97+ 예상. 독립 관측치가 아닌 강한 양의 상관 검증용으로 명시할 것.</div>
+    </div>
+
+    <div class="foot">
+      <span>n = 10 (PE 5 / 비PE 5)</span>
+      <span>t=0 정렬: 사건시간(event-time) 권장</span>
+    </div>
+  </div>
+</body>
+</html>

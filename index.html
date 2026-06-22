@@ -290,6 +290,24 @@
 <p>Wang, H., &amp; Shi, J. (2022). Intermedia agenda setting amid the pandemic: A computational analysis. <i>Computational Intelligence and Neuroscience</i>.</p>
 </div>
 
+<!-- 부록 -->
+<h2>부록. 분석 파이프라인과 데이터베이스</h2>
+<p>본 연구의 전 과정은 <b>수집 → 관련성 필터링 → 형태소 → 임베딩 → 분석·검정</b>의 다섯 단계로 이어지며, 검색어만 바꾸면 다른 사건에도 그대로 적용되도록 두 벌의 노트북으로 공개한다. 크롤러(<b>뉴스크롤러</b>)가 검색어별 기사와 본문을 모으면, 분석 노트북(<b>뉴스분석</b>)이 관련성 필터링부터 통계 검정까지 한 번에 수행한다. 두 노트북은 Google Colab과 서버 JupyterLab에서 똑같이 동작하며, 코드와 분류 프롬프트는 공개 저장소 <a href="https://github.com/sdkparkforbi/news-crawler">github.com/sdkparkforbi/news-crawler</a> 에 있다.</p>
+<p>관련성 필터링은 대형 언어모델(gpt-4o-mini)로 각 기사를 관련·무관과 세부 카테고리로 분류하는 단계다. 회사명과 한 줄 맥락, 카테고리 목록을 담은 분류 프롬프트에 제목과 본문 앞부분을 스무 건씩 묶어 넣으면, 모델이 JSON으로 관련 여부와 카테고리를 돌려준다. 본 연구는 관련으로 분류된 기사만 분석 대상으로 삼아, 사건과 무관한 보도가 동조화 측정을 흐리지 않도록 하였으며, 고려아연은 이 절차로 관련 50,188건이 가려졌다.</p>
+<p>측정의 토대가 되는 기사와 임베딩은 MySQL 데이터베이스 <b>articlepush</b>에 적재한다. 원본 기사는 articles 테이블에 사건명·발행시각·매체·기자·본문과 함께 관련성·카테고리가 저장되고, 네 가지 임베딩은 각각 별도 테이블에 float16 벡터로 저장되어 분석 단계에서 기사 단위로 빠르게 불러올 수 있다. 표 4는 사용한 데이터베이스 테이블을 정리한 것이다.</p>
+<table>
+  <caption><b>표 4.</b> 분석에 사용한 데이터베이스(articlepush · MySQL)와 테이블</caption>
+  <thead><tr><th class="l">테이블</th><th class="l">내용</th><th class="l">핵심 컬럼 (차원·모델)</th></tr></thead>
+  <tbody>
+    <tr><td class="l">articles</td><td class="l">원본 기사·메타·분류</td><td class="l">id, company, related, category, published_dt, press, reporter, title, body</td></tr>
+    <tr><td class="l">article_embeddings</td><td class="l">① bge-m3 · 제목+본문</td><td class="l">article_id, vec(1,024d float16), model, dim, company</td></tr>
+    <tr><td class="l">article_noun_embeddings</td><td class="l">② bge-m3 · 명사</td><td class="l">article_id, vec(1,024d), nouns_all·noun_tfidf·nouns_kept(JSON)</td></tr>
+    <tr><td class="l">article_emb_oai</td><td class="l">③ 3large · 제목+본문</td><td class="l">article_id, vec(3,072d float16), model, dim</td></tr>
+    <tr><td class="l">article_noun_emb_oai</td><td class="l">④ 3large · 명사</td><td class="l">article_id, vec(3,072d), model, dim</td></tr>
+  </tbody>
+</table>
+<p>학생과 후속 연구자는 노트북에서 검색어·사건일·분류 카테고리만 바꾸면 본 보고서와 같은 그림과 표를 재현할 수 있다. API 키(bge-m3·gpt-4o-mini·3large)는 입력 즉시 메모리에만 두어 코드나 로그에 남기지 않으며, 결과는 캐시되어 중간에 끊겨도 다시 실행하면 이어서 진행된다.</p>
+
 <footer>
   데이터·코드: <a href="indicators_full_koreazinc.csv">동조화 지표 큐브(4임베딩×4창×3단위)</a> ·
   <a href="mediatests_koreazinc.csv">매체 동조화 검정 결과</a> ·

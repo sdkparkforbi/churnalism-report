@@ -3,333 +3,224 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PE·비PE 부정이슈 이벤트 타임라인</title>
+<title>PE 부정보도 케이스 타임라인 (2021–2027)</title>
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="PE 부정보도 케이스 타임라인 (2021–2027)">
+<meta property="og:description" content="MBK·한앤코·어피니티 등 사모펀드 9건 + 정산피해 1건 — 보도 폭발 시점(t=0) 기준 churnalism 분석 케이스">
+<meta property="og:image" content="https://placehold.co/1200x630/1c1c1a/f1efe8.png?text=PE+Negative+Coverage+Timeline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PE 부정보도 케이스 타임라인 (2021–2027)">
+<meta name="twitter:image" content="https://placehold.co/1200x630/1c1c1a/f1efe8.png?text=PE+Negative+Coverage+Timeline">
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  :root{
+    --bg:#f7f6f1; --panel:#ffffff; --ink:#2c2c2a; --muted:#73726c; --line:#d8d6cd;
+    --pe-bar:#85b7eb; --np-bar:#f0997b; --sec-bar:#efb56b;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 48px;}
+  h1{font-size:22px;font-weight:600;margin:0 0 4px;}
+  h2{font-size:17px;font-weight:600;margin:32px 0 12px;}
+  .sub{font-size:14px;color:var(--muted);margin:0 0 20px;}
 
-  :root {
-    --ink: #14181f;
-    --paper: #f6f4ef;
-    --grid: #d9d4c8;
-    --muted: #6b6f78;
-    --pe: #1f4e79;
-    --pe-soft: #e4ecf4;
-    --pe-line: #2f6db0;
-    --npe: #b8531a;
-    --npe-soft: #f6e7da;
-    --npe-line: #d4732e;
-    --t0: #14181f;
-  }
+  .legend{display:flex;flex-wrap:wrap;align-items:center;gap:18px;font-size:13px;color:var(--muted);
+    padding:12px 16px;background:var(--panel);border:0.5px solid var(--line);border-radius:12px;margin-bottom:18px;}
+  .legend .it{display:flex;align-items:center;gap:7px;}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block;}
+  .dot-t0{width:13px;height:13px;border-radius:50%;background:#185fa5;position:relative;display:inline-block;}
+  .dot-t0::after{content:"";position:absolute;inset:4.5px;background:#fff;border-radius:50%;}
+  .dot-add{width:11px;height:11px;border-radius:50%;background:#888780;display:inline-block;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .chart{background:var(--panel);border:0.5px solid var(--line);border-radius:14px;padding:8px 0 4px;overflow-x:auto;}
+  svg{display:block;min-width:880px;width:100%;height:auto;}
 
-  body {
-    background: #cdc8bc;
-    font-family: 'IBM Plex Sans KR', sans-serif;
-    color: var(--ink);
-    display: flex;
-    justify-content: center;
-    padding: 40px 20px;
-  }
+  .grp-pe{fill:#185fa5;font-size:12px;font-weight:600;}
+  .grp-np{fill:#d85a30;font-size:12px;font-weight:600;}
+  .yr{fill:#2c2c2a;font-size:13px;font-weight:600;}
+  .lbl{fill:#2c2c2a;font-size:13px;font-weight:600;}
+  .meta{fill:#888780;font-size:11.5px;}
+  .date{fill:#73726c;font-size:11px;}
+  .gl{stroke:#d8d6cd;stroke-width:0.5;stroke-dasharray:2 4;}
+  .axis{stroke:#888780;stroke-width:0.5;}
 
-  .sheet {
-    width: 1180px;
-    background: var(--paper);
-    padding: 56px 60px 64px;
-    box-shadow: 0 24px 60px rgba(0,0,0,.22);
-  }
-
-  /* Header */
-  .eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    letter-spacing: .26em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-  h1 {
-    font-size: 33px;
-    font-weight: 700;
-    letter-spacing: -.01em;
-    line-height: 1.2;
-    margin-bottom: 10px;
-  }
-  h1 .accent { color: var(--npe); }
-  .sub {
-    font-size: 14.5px;
-    color: var(--muted);
-    font-weight: 400;
-    max-width: 760px;
-    line-height: 1.55;
-  }
-  .legend {
-    display: flex;
-    gap: 28px;
-    margin-top: 22px;
-    font-size: 13px;
-    font-weight: 500;
-  }
-  .legend .item { display: flex; align-items: center; gap: 8px; }
-  .swatch { width: 26px; height: 12px; border-radius: 2px; }
-  .swatch.pe { background: var(--pe); }
-  .swatch.npe { background: var(--npe); }
-  .legend .t0mark {
-    width: 12px; height: 12px; border-radius: 50%;
-    background: var(--t0); border: 2px solid var(--paper);
-    box-shadow: 0 0 0 1.5px var(--t0);
-  }
-  .legend .small { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
-
-  /* Timeline grid */
-  .chart { margin-top: 40px; position: relative; }
-
-  .axis {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    border-top: 1.5px solid var(--ink);
-    position: relative;
-  }
-  .axis .yr {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 8px 0 0 10px;
-    color: var(--ink);
-    border-left: 1px solid var(--grid);
-  }
-  .axis .yr:first-child { border-left: none; }
-
-  .lane-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .18em;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin: 26px 0 4px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .lane-label.pe { color: var(--pe); }
-  .lane-label.npe { color: var(--npe); }
-  .lane-label .rule { flex: 1; height: 1px; }
-  .lane-label.pe .rule { background: var(--pe-line); opacity: .35; }
-  .lane-label.npe .rule { background: var(--npe-line); opacity: .35; }
-
-  .lanes { position: relative; }
-
-  /* vertical year gridlines overlaying lanes */
-  .gridlines {
-    position: absolute; inset: 0; z-index: 0;
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    pointer-events: none;
-  }
-  .gridlines span { border-left: 1px solid var(--grid); }
-  .gridlines span:first-child { border-left: none; }
-
-  .row {
-    position: relative;
-    height: 46px;
-    z-index: 1;
-  }
-  .track {
-    position: absolute;
-    top: 50%; transform: translateY(-50%);
-    height: 7px;
-    border-radius: 4px;
-  }
-  .row.pe .track { background: var(--pe-soft); }
-  .row.npe .track { background: var(--npe-soft); }
-  .row.pe .track .fill { background: var(--pe-line); }
-  .row.npe .track .fill { background: var(--npe-line); }
-  .track .fill {
-    position: absolute; left: 0; top: 0; height: 100%;
-    border-radius: 4px; opacity: .5;
-  }
-
-  .name {
-    position: absolute;
-    top: 50%; transform: translateY(-50%);
-    font-size: 13.5px; font-weight: 600;
-    white-space: nowrap;
-  }
-  .name .org {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px; font-weight: 500;
-    color: var(--muted); margin-left: 7px;
-  }
-
-  /* shock markers */
-  .shock {
-    position: absolute; top: 50%;
-    width: 9px; height: 9px; border-radius: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--muted);
-    z-index: 2;
-  }
-  .row.pe .shock { background: var(--pe-line); }
-  .row.npe .shock { background: var(--npe-line); }
-  .shock.t0 {
-    width: 15px; height: 15px;
-    background: var(--t0);
-    border: 2.5px solid var(--paper);
-    box-shadow: 0 0 0 2px var(--t0);
-    z-index: 3;
-  }
-  .shock .lbl {
-    position: absolute; left: 50%; bottom: 16px;
-    transform: translateX(-50%);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9.5px; font-weight: 600;
-    color: var(--ink); white-space: nowrap;
-    background: rgba(246,244,239,.85);
-    padding: 0 3px;
-  }
-  .shock .lbl.below {
-    bottom: auto; top: 16px;
-  }
-
-  /* footnote */
-  .note {
-    margin-top: 44px;
-    border-top: 1px solid var(--grid);
-    padding-top: 18px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 40px;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-  .note b { color: var(--ink); font-weight: 600; }
-  .note .warn b { color: var(--npe); }
-  .foot {
-    margin-top: 26px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .04em;
-    color: var(--muted);
-    display: flex; justify-content: space-between;
-  }
+  table{width:100%;border-collapse:collapse;font-size:13px;background:var(--panel);
+    border:0.5px solid var(--line);border-radius:12px;overflow:hidden;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:0.5px solid var(--line);vertical-align:top;}
+  th{background:#f1efe8;font-weight:600;font-size:12px;color:#444441;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  td.c{white-space:nowrap;}
+  .tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:6px;font-weight:600;}
+  .tag-pe{background:#e6f1fb;color:#0c447c;}
+  .tag-np{background:#faece7;color:#993c1d;}
+  .tag-sec{background:#faeeda;color:#854f0b;}
+  a{color:#185fa5;text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .src a{display:inline-block;margin-right:6px;font-size:12px;}
+  .note{margin-top:16px;font-size:12.5px;color:var(--muted);line-height:1.7;}
+  .note b{color:var(--ink);font-weight:600;}
 </style>
 </head>
 <body>
-  <div class="sheet">
-    <div class="eyebrow">UNIT-ROOT TEST · EVENT TIMELINE</div>
-    <h1>사모펀드·비(非)PE 부정이슈 <span class="accent">10건</span> 이벤트 타임라인</h1>
-    <p class="sub">뉴스 임베딩 코사인 유사도의 충격 비소멸(ρ≈1) 검정을 위한 사건 정렬. 굵은 점은 이슈 본격화 시점(t=0), 작은 점은 한 사례 내 추가 충격점.</p>
+<div class="wrap">
+  <h1>PE 부정보도 케이스 타임라인 — churnalism 분석용</h1>
+  <p class="sub">사모펀드(PE) 9건 + 정산피해 1건 · 보도 폭발 시점(t=0) 기준 · 관찰창 = 원점 1년 전 ~ 후속사건 1년 후</p>
 
-    <div class="legend">
-      <div class="item"><span class="swatch pe"></span> PE · 사모펀드 LBO·경영권 (5)</div>
-      <div class="item"><span class="swatch npe"></span> 비PE · 지급불능·정산피해 (5)</div>
-      <div class="item"><span class="t0mark"></span> t=0 본격화</div>
-      <div class="item"><span class="small"></span> 추가 충격점</div>
-    </div>
-
-    <div class="chart">
-      <div class="axis">
-        <div class="yr">2021</div>
-        <div class="yr">2022</div>
-        <div class="yr">2023</div>
-        <div class="yr">2024</div>
-        <div class="yr">2025</div>
-      </div>
-
-      <div class="lanes">
-        <div class="gridlines"><span></span><span></span><span></span><span></span><span></span></div>
-
-        <!-- PE -->
-        <div class="lane-label pe">PE GROUP<span class="rule"></span></div>
-
-        <!-- 홈플러스: 2025.03 t0, 2025.12 -->
-        <div class="row pe">
-          <div class="track" style="left:80%; right:0;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:55%;">홈플러스 <span class="org">MBK</span></div>
-          <div class="shock t0" style="left:84.5%;"><span class="lbl">2025.03 회생신청</span></div>
-          <div class="shock" style="left:99%;"><span class="lbl below">25.12</span></div>
-        </div>
-
-        <!-- 오스템: 2023.06, 2023.08 t0 -->
-        <div class="row pe">
-          <div class="track" style="left:48%; width:9%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:58.5%;">오스템임플란트 <span class="org">MBK·UCK</span></div>
-          <div class="shock" style="left:47.5%;"><span class="lbl below">23.06</span></div>
-          <div class="shock t0" style="left:54.5%;"><span class="lbl">2023.08 상폐</span></div>
-        </div>
-
-        <!-- 락앤락: 2021 매각, 2023.11 t0, 2024.01 -->
-        <div class="row pe">
-          <div class="track" style="left:8%; width:60%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:69%;">락앤락 <span class="org">어피니티</span></div>
-          <div class="shock" style="left:8%;"><span class="lbl below">21 공장매각</span></div>
-          <div class="shock t0" style="left:62.5%;"><span class="lbl">2023.11 공장중단</span></div>
-          <div class="shock" style="left:67%;"><span class="lbl below">24.01 해고</span></div>
-        </div>
-
-        <!-- 남양유업: 2021.05 SPA, 2024.01 t0 -->
-        <div class="row pe">
-          <div class="track" style="left:7%; width:60%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:68.5%;">남양유업 <span class="org">한앤</span></div>
-          <div class="shock" style="left:7%;"><span class="lbl below">21.05 SPA</span></div>
-          <div class="shock t0" style="left:66.5%;"><span class="lbl">2024.01 대법확정</span></div>
-        </div>
-
-        <!-- 고려아연: 2024.09 t0 -->
-        <div class="row pe">
-          <div class="track" style="left:73%; width:3%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:51%;">고려아연 <span class="org">MBK·영풍</span></div>
-          <div class="shock t0" style="left:74.5%;"><span class="lbl">2024.09 공개매수</span></div>
-        </div>
-
-        <!-- 비PE -->
-        <div class="lane-label npe">NON-PE GROUP<span class="rule"></span></div>
-
-        <!-- 큐텐 티메프: 2023.10, 2024.07 t0 -->
-        <div class="row npe">
-          <div class="track" style="left:68%; width:6%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:42%;">큐텐(티메프) <span class="org">e-commerce</span></div>
-          <div class="shock" style="left:68%;"><span class="lbl below">23.10 정산변경</span></div>
-          <div class="shock t0" style="left:72.5%;"><span class="lbl">2024.07 지연선언</span></div>
-        </div>
-
-        <!-- 해피머니: 2024.08 t0 -->
-        <div class="row npe">
-          <div class="track" style="left:73.5%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:50%;">해피머니 <span class="org">상품권</span></div>
-          <div class="shock t0" style="left:73.5%;"><span class="lbl">2024.08 환불중단</span></div>
-        </div>
-
-        <!-- 머지포인트: 2021.08 t0 -->
-        <div class="row npe">
-          <div class="track" style="left:10%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:13.5%;">머지포인트 <span class="org">핀테크 선불</span></div>
-          <div class="shock t0" style="left:10%;"><span class="lbl">2021.08 환불대란</span></div>
-        </div>
-
-        <!-- 위메프: 2024.07 t0 -->
-        <div class="row npe">
-          <div class="track" style="left:72.5%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:50%;">위메프 <span class="org">e-commerce</span></div>
-          <div class="shock t0" style="left:72.5%;"><span class="lbl">2024.07 미정산</span></div>
-        </div>
-
-        <!-- 티몬: 2024.07 t0 -->
-        <div class="row npe">
-          <div class="track" style="left:72.5%; width:2%;"><div class="fill" style="left:0; right:0;"></div></div>
-          <div class="name" style="left:50%;">티몬 <span class="org">e-commerce</span></div>
-          <div class="shock t0" style="left:72.5%;"><span class="lbl">2024.07 매각절차</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="note">
-      <div><b>다중 충격점 구조</b> — 락앤락·큐텐·남양유업은 한 사례 안에 충격이 반복 주입된다. 코사인 유사도가 떨어질 만하면 다시 충격이 들어와 0.9에 재고정되는 패턴이 예상되므로, 충격 더미변수로 통제 필요.</div>
-      <div class="warn"><b>의도된 중복</b> — 큐텐·위메프·티몬은 동일 티메프 사태로 임베딩 유사도 0.97+ 예상. 독립 관측치가 아닌 강한 양의 상관 검증용으로 명시할 것.</div>
-    </div>
-
-    <div class="foot">
-      <span>n = 10 (PE 5 / 비PE 5)</span>
-      <span>t=0 정렬: 사건시간(event-time) 권장</span>
-    </div>
+  <div class="legend">
+    <span class="it"><span class="sw" style="background:#85b7eb"></span> PE · 사모펀드</span>
+    <span class="it"><span class="sw" style="background:#f0997b"></span> 비PE · 정산피해</span>
+    <span class="it"><span class="dot-t0"></span> t=0 (보도 폭발/본격화)</span>
+    <span class="it"><span class="dot-add"></span> 후속 핵심 사건</span>
   </div>
+
+  <div class="chart">
+    <svg id="tl" viewBox="0 0 1180 654" role="img" aria-label="PE 9건과 비PE 1건의 보도 폭발 시점과 후속 사건을 2021~2027 연도축에 표시한 타임라인"></svg>
+  </div>
+
+  <h2>케이스 상세 (10건)</h2>
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th>#</th><th>케이스</th><th>행위자</th><th>유형</th>
+        <th>t=0 (원점)</th><th>후속 핵심 사건</th><th>분석 관찰창</th><th>출처</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p class="note">
+    <b>주석</b> — 사례 4(마키노)는 t=0 이후 관찰이 진행 중이라 후속사건 관찰창 끝(2027-04)이 미래다.
+    사례 9(두산공작기계)는 실제 사건(2019)과 보도 폭발(2024-12)이 분리된 '과거 사건 재소환' 케이스로, t=0는 보도 폭발일 기준이다.
+    사례 10(bhc)은 가격인상→납품가인상→배당논란으로 이어지는 지속형 갈등으로, t=0는 최초 가격인상 보도 시점이다.
+    오스템임플란트(사례 8)는 실제 상폐가 2023-08이며, 이전 그림의 2025년 표기는 오류였다.
+  </p>
+</div>
+
+<script>
+const PE_BAR="#85b7eb", PE_COL="#185fa5", NP_BAR="#f0997b", NP_COL="#d85a30", GRAY="#888780";
+const YEARS=[2021,2022,2023,2024,2025,2026,2027];
+const X0=60, X1=1140;
+const span=(X1-X0)/YEARS.length;
+function xOf(year,frac=0){ return X0 + ((year-2021)+frac)*span; }
+
+// frac: 0=1월, 0.5=7월, 1=12월
+const CASES=[
+  {n:1, name:"고려아연", meta:"MBK·영풍", type:"pe",
+   t0:{y:2024,f:0.70,d:"24.09 공개매수"}, end:{y:2025,f:0.06,d:"25.01 임시주총"},
+   win:"2023-09-13 ~ 2026-01-23",
+   t0full:"2024-09-13", endfull:"2025-01-23",
+   src:[["나무위키","https://namu.wiki/w/고려아연 경영권 분쟁"],["경향","https://www.khan.co.kr/economy/economy-general/article/202410141640001"]]},
+  {n:2, name:"홈플러스", meta:"MBK", type:"pe",
+   t0:{y:2025,f:0.18,d:"25.03 회생신청"}, end:{y:2025,f:0.99,d:"25.12 회생계획안"},
+   win:"2024-03-04 ~ 2026-12-29",
+   t0full:"2025-03-04", endfull:"2025-12-29",
+   src:[["이코노미스트","https://economist.co.kr/article/view/ecn202606080056"],["더스쿠프","https://www.thescoop.co.kr/news/articleView.html?idxno=309188"]]},
+  {n:3, name:"롯데카드", meta:"MBK", type:"pe",
+   t0:{y:2025,f:0.62,d:"25.08 해킹"}, end:{y:2025,f:0.72,d:"25.09 유출발표"},
+   win:"2024-08-14 ~ 2026-09-18",
+   t0full:"2025-08-14", endfull:"2025-09-18",
+   src:[["나무위키","https://namu.wiki/w/롯데카드 개인신용정보 유출 사고"],["딜사이트","https://news.dealsitetv.com/articles/159667"]]},
+  {n:4, name:"마키노", meta:"MBK·일본", type:"pe",
+   t0:{y:2024,f:0.45,d:"24.06 공개매수"}, end:{y:2026,f:0.32,d:"26.04 인수제동"},
+   win:"2023-06 ~ 2027-04-23 (관찰중)",
+   t0full:"2024-06", endfull:"2026-04-23",
+   src:[["세계일보","https://www.segye.com/newsView/20260424511925"],["디지털데일리","https://www.ddaily.co.kr/page/view/2026042614101567779"]]},
+  {n:5, name:"큐텐·티메프", meta:"e-commerce", type:"np",
+   t0:{y:2024,f:0.55,d:"24.07 지연선언"}, end:{y:2025,f:0.85,d:"25.11 위메프파산"},
+   win:"2023-07-22 ~ 2026-11",
+   t0full:"2024-07-22", endfull:"2025-11",
+   src:[["나무위키","https://namu.wiki/w/큐텐 정산 지연 사태"],["ZDNet","https://zdnet.co.kr/view/?no=20251111164848"]]},
+  {n:6, name:"남양유업", meta:"한앤코", type:"pe",
+   t0:{y:2021,f:0.40,d:"21.05 SPA"}, end:{y:2024,f:0.02,d:"24.01 대법확정"},
+   win:"2020-05-27 ~ 2025-01-04",
+   t0full:"2021-05-27", endfull:"2024-01-04",
+   src:[["비즈니스포스트","https://www.businesspost.co.kr/BP?command=article_view&num=338281"],["딜사이트","https://dealsite.co.kr/articles/117299"]]},
+  {n:7, name:"락앤락", meta:"어피니티", type:"pe",
+   t0:{y:2024,f:0.29,d:"24.04 공개매수"}, end:{y:2024,f:0.94,d:"24.12 자진상폐"},
+   win:"2023-04-17 ~ 2025-12-09",
+   t0full:"2024-04-17", endfull:"2024-12-09",
+   src:[["시사위크","https://www.sisaweek.com/news/articleView.html?idxno=213834"],["머니투데이","https://www.mt.co.kr/future/2024/12/01/2024120114143728030"]]},
+  {n:8, name:"오스템임플란트", meta:"MBK·UCK", type:"pe",
+   t0:{y:2023,f:0.07,d:"23.01 공개매수"}, end:{y:2023,f:0.62,d:"23.08 상장폐지"},
+   win:"2022-01-25 ~ 2024-08-14",
+   t0full:"2023-01-25", endfull:"2023-08-14",
+   src:[["나무위키","https://namu.wiki/w/오스템임플란트"],["이데일리","https://marketin.edaily.co.kr/News/Read?newsId=01275926635703384"]]},
+  {n:9, name:"두산공작기계", meta:"MBK", type:"sec",
+   t0:{y:2024,f:0.97,d:"24.12 보도폭발"}, end:{y:2024,f:0.97,d:"(2019 실제시도)"},
+   win:"2023-12-21 ~ 2025-12-21",
+   t0full:"2024-12-21", endfull:"2019 (실제) / 2024-12 (재소환)",
+   src:[["머니S","https://www.moneys.co.kr/article/2024122017250833443"],["뉴스핌","https://www.newspim.com/news/view/20241222000157"]]},
+  {n:10, name:"bhc치킨", meta:"MBK", type:"pe",
+   t0:{y:2023,f:0.95,d:"23.12 가격인상"}, end:{y:2025,f:0.27,d:"25.04 배당논란"},
+   win:"2022-12 ~ 2026-04",
+   t0full:"2023-12", endfull:"2025-04",
+   src:[["비즈워치","https://v.daum.net/v/20250409094003262"],["뉴스후플러스","https://www.newswhoplus.com/news/articleView.html?idxno=18542"]]},
+];
+
+const svg=document.getElementById('tl');
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs={},text){ const e=document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]); if(text!=null) e.textContent=text; return e; }
+
+const AX_Y=50;
+svg.appendChild(el('line',{x1:X0,y1:AX_Y,x2:X1,y2:AX_Y,class:'axis'}));
+YEARS.forEach(y=>{
+  const x=xOf(y,0);
+  svg.appendChild(el('text',{x:x,y:72,class:'yr'},String(y)));
+  if(y>2021) svg.appendChild(el('line',{x1:x,y1:56,x2:x,y2:630,class:'gl'}));
+});
+
+function barCol(t){ return t==="np"?NP_BAR:PE_BAR; }
+function t0Col(t){ return t==="np"?NP_COL:PE_COL; }
+
+let yp=120;
+CASES.forEach(c=>{
+  const tx=xOf(c.t0.y,c.t0.f);
+  const ex=xOf(c.end.y,c.end.f);
+  const left=Math.min(tx,ex), right=Math.max(tx,ex);
+  if(right>left+4){
+    svg.appendChild(el('line',{x1:left,y1:yp,x2:right,y2:yp,stroke:barCol(c.type),'stroke-width':3,'stroke-linecap':'round'}));
+  }
+  // t0 dot
+  svg.appendChild(el('circle',{cx:tx,cy:yp,r:6,fill:t0Col(c.type)}));
+  svg.appendChild(el('circle',{cx:tx,cy:yp,r:2.5,fill:'#fff'}));
+  svg.appendChild(el('text',{x:tx,y:yp-10,class:'date'},c.t0.d));
+  // end dot
+  if(right>left+4){
+    svg.appendChild(el('circle',{cx:ex,cy:yp,r:5,fill:GRAY}));
+    svg.appendChild(el('text',{x:ex,y:yp+19,class:'date'},c.end.d));
+  }
+  // label
+  const lx=Math.max(right,tx)+16;
+  const t=el('text',{x:lx,y:yp+4});
+  t.appendChild(el('tspan',{class:'lbl'},c.name));
+  t.appendChild(el('tspan',{class:'meta',dx:7},c.meta));
+  svg.appendChild(t);
+  yp+=50;
+});
+svg.setAttribute('viewBox',`0 0 1180 ${yp+10}`);
+
+// table
+const tb=document.querySelector('#tbl tbody');
+CASES.forEach(c=>{
+  const tr=document.createElement('tr');
+  const tagcls=c.type==="np"?"tag-np":(c.type==="sec"?"tag-sec":"tag-pe");
+  const tagtxt=c.type==="np"?"비PE":(c.type==="sec"?"경제안보":"PE");
+  const srcHtml=c.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`).join("");
+  tr.innerHTML=`
+    <td class="c">${c.n}</td>
+    <td><b>${c.name}</b></td>
+    <td class="c">${c.meta}</td>
+    <td class="c"><span class="tag ${tagcls}">${tagtxt}</span></td>
+    <td class="c">${c.t0full}</td>
+    <td class="c">${c.endfull}</td>
+    <td class="c">${c.win}</td>
+    <td class="src">${srcHtml}</td>`;
+  tb.appendChild(tr);
+});
+</script>
 </body>
 </html>
